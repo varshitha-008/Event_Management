@@ -1,45 +1,59 @@
 import React from 'react';
-import { Box, Heading, Text, Button } from '@chakra-ui/react';
+import { Box, Heading, Text, SimpleGrid, Button, VStack, Icon } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import EventCard from './EventCard';
+import { FaRegCalendarAlt, FaSignInAlt, FaShareAlt } from 'react-icons/fa'; // Importing icons
 
 const Home = () => {
-  const events = [
-    { id: 1, name: 'Event One', date: '2024-08-17', location: 'Location One', description: 'Description One' },
-    // Add more events here
+  const features = [
+    {
+      id: 1,
+      title: 'Browse Events',
+      description: 'Explore a wide range of events happening around you and never miss out on exciting opportunities.',
+      icon: FaRegCalendarAlt,
+    },
+    {
+      id: 2,
+      title: 'Register & Attend',
+      description: 'Easily register for events with just a click, and join like-minded people for amazing experiences.',
+      icon: FaSignInAlt,
+    },
+    {
+      id: 3,
+      title: 'Share Events',
+      description: 'Share events with your friends and family to spread the word and make events more popular.',
+      icon: FaShareAlt,
+    },
   ];
 
-  const handleRegister = (event) => {
-    // Handle registration logic here
-  };
-
   return (
-    <Box p={4}>
-      {/* <Heading mb={4}>Upcoming Events</Heading>
-      <Box mb={8}>
-        {events.map(event => (
-          <EventCard key={event.id} event={event} onRegister={handleRegister} />
+    <Box p={8} h={'100vh'} >
+      <Heading mb={8} textAlign="center" color="white">
+        How Our Platform Works
+      </Heading>
+      
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+        {features.map((feature) => (
+          <Box
+            key={feature.id}
+            bg="gray.100"
+            p={6}
+            borderRadius="lg"
+            boxShadow="lg"
+            textAlign="center"
+            transition="transform 0.2s"
+            _hover={{ transform: 'scale(1.05)' }}
+          >
+            <VStack spacing={4}>
+              <Icon as={feature.icon} w={12} h={12} color="teal.500" />
+              <Heading size="md">{feature.title}</Heading>
+              <Text>{feature.description}</Text>
+              <Button colorScheme="gray" as={Link} to="/login">
+                Learn More
+              </Button>
+            </VStack>
+          </Box>
         ))}
-      </Box> */}
-      <Box
-        p={4}
-        bg="gray.100"
-        borderRadius="md"
-        boxShadow="md"
-        textAlign="center"
-      >
-        <Heading size="lg" mb={4}>Welcome to Our Event Platform</Heading>
-        <Text mb={4}>
-          Discover and register for amazing events. Explore various events happening around you, and be a part of the excitement.
-        </Text>
-        <Button
-          colorScheme="teal"
-          as={Link}
-          to="/login"
-        >
-          Get Started
-        </Button>
-      </Box>
+      </SimpleGrid>
     </Box>
   );
 };

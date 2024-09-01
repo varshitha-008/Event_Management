@@ -24,7 +24,7 @@ const EventDetails = () => {
 
   const handleRegister = async () => {
     const token = localStorage.getItem('token');
-
+  
     if (!token) {
       toast({
         title: 'Not Logged In',
@@ -36,14 +36,18 @@ const EventDetails = () => {
       navigate('/login');
       return;
     }
-
+  
     try {
-      const response = await axios.post(`https://event-management-ngu0.onrender.com/api/events/${id}/register`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const response = await axios.patch(
+        `https://event-management-ngu0.onrender.com/api/events/${id}/register`,
+        {}, // empty body, as we're modifying an existing resource
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
       toast({
         title: response.data.message,
         status: 'success',
@@ -60,6 +64,55 @@ const EventDetails = () => {
       });
     }
   };
+
+
+
+  const handleCancelRegistration = async () => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      toast({
+        title: 'Not Logged In',
+        description: 'Please log in to cancel your registration.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await axios.patch(
+        `https://event-management-ngu0.onrender.com/api/events/${id}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast({
+        title: response.data.message,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+
+      // Refetch event details after cancellation
+      fetchEvent();
+    } catch (error) {
+      toast({
+        title: 'Cancellation Failed',
+        description: error.response?.data.message || 'There was a problem canceling your registration.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+  
 
   const handleShare = () => {
     const eventUrl = `${window.location.origin}/events/${id}`;
@@ -84,22 +137,27 @@ const EventDetails = () => {
   };
 
   return (
-    <Box p="6">
+    <Box p="6" bg="#1a202c" borderRadius="md" boxShadow="md" maxW="600px" mx="auto" my="8">
       {event ? (
         <>
-          <Heading mb="4">{event.name}</Heading>
-          <Text mb="2">{event.description}</Text>
-          <Text mb="2">Date: {new Date(event.date).toLocaleDateString()}</Text>
-          <Text mb="2">Location: {event.location}</Text>
-          <Button mt="4" colorScheme="teal" onClick={handleRegister}>
+          <Heading mb="4" color="white">{event.name}</Heading>
+          <Text mb="2" color="gray.300">{event.description}</Text>
+          <Text mb="2" color="gray.300">Date: {new Date(event.date).toLocaleDateString()}</Text>
+          <Text mb="2" color="gray.300">Location: {event.location}</Text>
+          <Text mb="2" color="gray.300">Participants: {event.participants?.length || 0}</Text>
+          <Text mb="2" color="gray.300">Waitlist: {event.waitlist?.length || 0}</Text>
+          <Button mt="4" colorScheme="gray" variant="solid" onClick={handleRegister}>
             Register for Event
           </Button>
-          <Button mt="4" ml="4" colorScheme="blue" onClick={handleShare}>
+          <Button mt="4" ml="4" colorScheme="gray" variant="solid" onClick={handleCancelRegistration}>
+            Cancel Registration
+          </Button>
+          <Button mt="4" ml="4" colorScheme="gray" variant="solid" onClick={handleShare}>
             Share Event
           </Button>
         </>
       ) : (
-        <Text>Loading event details...</Text>
+        <Text color="gray.300">Loading event details...</Text>
       )}
     </Box>
   );

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Flex, Button, Heading, Input, useDisclosure, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton } from '@chakra-ui/react';
+import { Box, Flex, Button, Heading, Input, useDisclosure, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, IconButton, useBreakpointValue } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
-// import { AiOutlineSearch } from 'react-icons/ai';
+import { HamburgerIcon } from '@chakra-ui/icons'; // Importing the hamburger icon
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-
+  
   const handleSearch = () => {
     if (searchQuery.trim()) {
       navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
@@ -15,17 +15,30 @@ const Navbar = () => {
     }
   };
 
+  const isDesktop = useBreakpointValue({ base: false, md: true });
+
   return (
     <Flex as="nav" p={4} bg="gray.800" color="white" align="center" justify="space-between">
       <Heading size="lg">Event Manager</Heading>
-      <Box>
-        <Button as={Link} to="/" mr={4}>Home</Button>
-        <Button as={Link} to="/login" mr={4}>Login</Button>
-        <Button as={Link} to="/register">Register</Button>
-        <Button onClick={onOpen} ml={4} colorScheme='white' variant="outline" >
-          Search
-        </Button>
-      </Box>
+
+      {isDesktop ? (
+        <Box>
+          <Button as={Link} to="/" mr={4}>Home</Button>
+          <Button as={Link} to="/login" mr={4}>Login</Button>
+          <Button as={Link} to="/register">Register</Button>
+          <Button onClick={onOpen} ml={4} colorScheme="teal" variant="outline">
+            Search
+          </Button>
+        </Box>
+      ) : (
+        <IconButton
+          icon={<HamburgerIcon />}
+          aria-label="Open Menu"
+          variant="outline"
+          colorScheme="teal"
+          onClick={onOpen}
+        />
+      )}
 
       <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
         <DrawerOverlay />

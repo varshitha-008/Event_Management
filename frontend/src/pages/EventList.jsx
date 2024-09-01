@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, VStack, Button, Link, useToast } from '@chakra-ui/react';
+import { Box, Heading, Text, VStack, Button, Link, useToast, SimpleGrid, Center } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -52,44 +52,57 @@ const EventList = () => {
   };
 
   return (
-    <Box p="6">
-      <Heading mb="6">My Events</Heading>
+    <Box p="6"  minH="100vh">
+      <Heading mb="6" textAlign={'center'} color="#1a202c">My Events</Heading>
       {events.length > 0 ? (
-        <VStack spacing="4" align="stretch">
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing="6">
           {events.map((event) => (
-            <Box key={event._id} p="4" borderWidth="1px" borderRadius="lg">
-              <Heading size="md">{event.name}</Heading>
-              <Text mt="2">{event.description}</Text>
+            <Box   bg="#1a202c"
+              key={event._id}
+              p="4"
+              borderWidth="1px"
+              borderRadius="lg"
+              
+              color="white"
+            >
+              <Heading size="md" mb="2">{event.name}</Heading>
+              <Text>{event.description}</Text>
               <Text mt="2">Date: {new Date(event.date).toLocaleDateString()}</Text>
               <Box mt="4">
                 <Button
                   as={RouterLink}
                   to={`/events/${event._id}`}
-                  colorScheme="teal"
+                  bg="gray.600"
+                  color="white"
                   mr="2"
+                  _hover={{ bg: 'gray.500' }}
                 >
                   View & Register
                 </Button>
                 <Button
                   as={RouterLink}
                   to={`/update-event/${event._id}`}
-                  colorScheme="blue"
+                  bg="gray.600"
+                  color="white"
                   mr="2"
+                  _hover={{ bg: 'gray.500' }}
                 >
                   Update
                 </Button>
                 <Button
-                  colorScheme="red"
+                  bg="gray.600"
+                  color="white"
                   onClick={() => handleDelete(event._id)}
+                  _hover={{ bg: 'gray.500' }}
                 >
                   Delete
                 </Button>
               </Box>
             </Box>
           ))}
-        </VStack>
+        </SimpleGrid>
       ) : (
-        <Text>No events found.</Text>
+        <Text color="white">No events found.</Text>
       )}
     </Box>
   );
