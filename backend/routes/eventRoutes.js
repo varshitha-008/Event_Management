@@ -30,9 +30,9 @@ router.get('/my-events', protect, getMyEvents);
 router.get('/:id', getEventById);
 
 // Register for an event
-router.post('/:id/register', protect, registerForEvent);
+router.patch('/:id/register', protect, registerForEvent);
 
-router.post('/:id/cancel', protect, cancelRegistration);
+router.patch('/:id/cancel', protect, cancelRegistration);
 router.get('/stats', protect, admin, getEventStats);
 
 // router.put('/events/:id', , updateEvent);

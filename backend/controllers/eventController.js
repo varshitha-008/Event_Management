@@ -181,30 +181,33 @@ exports.registerForEvent = async (req, res) => {
     const userId = req.user._id;
 
     // Ensure arrays are initialized
-    if (!event.registeredParticipants) event.registeredParticipants = [];
-    if (!event.waitlistedParticipants) event.waitlistedParticipants = [];
+    event.participants = event.participants || [];
+    event.waitlist = event.waitlist || [];
 
     // Check if the user is already registered
-    if (event.registeredParticipants.includes(userId)) {
+    if (event.participants.includes(userId)) {
       return res.status(400).json({ message: 'Already registered for this event' });
     }
 
-    // Check if the user is on the waitlist
-    if (event.waitlistedParticipants.includes(userId)) {
+    // Check if the user is already on the waitlist
+    if (event.waitlist.includes(userId)) {
       return res.status(400).json({ message: 'You are already waitlisted for this event' });
     }
 
-    if (event.registeredParticipants.length < event.participantLimit) {
-      event.registeredParticipants.push(userId);
-      res.status(200).json({ message: 'Successfully registered for the event' });
+    // Add user to participants if there's space, otherwise add to waitlist
+    if (event.participants.length < event.participantLimit) {
+      event.participants.push(userId);
+      await event.save();
+      return res.status(200).json({ message: 'Successfully registered for the event' });
     } else {
-      event.waitlistedParticipants.push(userId);
-      res.status(200).json({ message: 'Event is full, you are added to the waitlist' });
+      event.waitlist.push(userId);
+      await event.save();
+      return res.status(200).json({ message: 'Event is full, you are added to the waitlist' });
     }
 
-    await event.save();
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Error registering for event:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -218,21 +221,27 @@ exports.cancelRegistration = async (req, res) => {
 
     const userId = req.user._id;
 
-    // Remove user from registeredParticipants
-    if (event.registeredParticipants.includes(userId)) {
-      event.registeredParticipants = event.registeredParticipants.filter(id => !id.equals(userId));
-    } else if (event.waitlistedParticipants.includes(userId)) {
-      event.waitlistedParticipants = event.waitlistedParticipants.filter(id => !id.equals(userId));
-    } else {
-      return res.status(400).json({ message: 'User is not registered for this event' });
+    // Remove the user from the participants or waitlist
+    const participantIndex = event.participants.indexOf(userId);
+    if (participantIndex !== -1) {
+      event.participants.splice(participantIndex, 1);
+      await event.save();
+      return res.status(200).json({ message: 'Successfully canceled registration' });
     }
 
-    await event.save();
-    res.status(200).json({ message: 'Successfully canceled registration' });
+    const waitlistIndex = event.waitlist.indexOf(userId);
+    if (waitlistIndex !== -1) {
+      event.waitlist.splice(waitlistIndex, 1);
+      await event.save();
+      return res.status(200).json({ message: 'Successfully removed from the waitlist' });
+    }
+
+    return res.status(400).json({ message: 'You are not registered for this event' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 // controller/eventController.js
 

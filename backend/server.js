@@ -22,6 +22,7 @@ app.use('/api/auth',authRoutes)
 app.use('/api/events', eventRoutes);
 
 
+
 app.get('/', async (req,res)=>{
   try {
        res.send('this is home route')
@@ -56,6 +57,8 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
 
 
 
